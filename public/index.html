@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>David Karyono | Lead Backend Developer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>David Karyono</h1>
+            <p class="subtitle">> Lead Backend Developer | System Architect</p>
+            <p class="location">📍 Banjarmasin, ID (UTC+8) | Ready for UK/EU Remote</p>
+        </header>
+
+        <section class="card">
+            <h2><span class="tag">&lt;projects&gt;</span> Proven Architectures</h2>
+            
+            <div class="project-item" style="margin-bottom: 25px; border-left: 2px solid #58a6ff; padding-left: 15px;">
+                <h3 style="color: #7ee787; font-size: 1.2rem;">> Auto-Marketing Engine</h3>
+                <p style="font-size: 0.9rem; color: #8b949e; margin-bottom: 8px;"><strong>Stack:</strong> PHP, SQL, 3rd-Party APIs, Cron Jobs</p>
+                <p>Engineered a robust, modular backend system that integrates complex relational databases with external APIs to fully automate lead generation. Built to handle high data throughput, eliminating manual B2C sales bottlenecks and driving operational efficiency.</p>
+            </div>
+
+            <div class="project-item" style="border-left: 2px solid #58a6ff; padding-left: 15px;">
+                <h3 style="color: #7ee787; font-size: 1.2rem;">> API-First Modular CRM (Core Infrastructure)</h3>
+                <p style="font-size: 0.9rem; color: #8b949e; margin-bottom: 8px;"><strong>Stack:</strong> Node.js, Express, Webhooks, Data Security</p>
+                <p>Designed a scalable, headless CRM backend prioritising data integrity and rapid retrieval. Utilised a 'Lego Modular' (microservices) approach to ensure future feature expansions can be deployed seamlessly without risking zero-downtime across the main sales pipeline.</p>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2><span class="tag">&lt;contact&gt;</span> Ping My Server</h2>
+            <form id="contactForm">
+                <input type="text" id="name" placeholder="Your Name" required>
+                <input type="email" id="email" placeholder="Your Work Email" required>
+                <textarea id="message" rows="4" placeholder="How can I help scale your backend?" required></textarea>
+                <button type="submit">Execute Request( )</button>
+                <div id="statusMessage"></div>
+            </form>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

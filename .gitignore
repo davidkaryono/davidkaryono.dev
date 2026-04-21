@@ -1,0 +1,8 @@
+# Ignore Node dependencies
+node_modules/
+
+# Ignore Environment variables (Crucial Security)
+.env
+
+# Ignore OS generated files
+.DS_Store
