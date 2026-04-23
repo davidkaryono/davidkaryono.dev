@@ -3,6 +3,14 @@ const cors = require('cors');
 const axios = require('axios');
 require('dotenv').config();
 
+// --- 1. INISIALISASI DATABASE KNEX ---
+const knex = require('knex');
+// Karena file index.js ini ada di dalam folder 'server', kita pakai '../' 
+// untuk naik satu folder ke root dan mengambil knexfile.js
+const knexConfig = require('../knexfile'); 
+const db = knex(knexConfig.development);
+// -------------------------------------
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -53,7 +61,8 @@ app.post('/api/contact', async (req, res) => {
 // ==========================================
 // 2. RECEIVER: THE WEBHOOK HANDLER (Receives incoming data from Telegram)
 // ==========================================
-app.post('/api/webhook/telegram', (req, res) => {
+// Tambahan 'async' di sini agar fungsi database await bisa berjalan
+app.post('/api/webhook/telegram', async (req, res) => {
     // 1. Security Check: Validate the Secret Token
     // Ensure the request comes genuinely from Telegram, not an unauthorized source.
     const secretToken = req.headers['x-telegram-bot-api-secret-token'];
@@ -70,16 +79,42 @@ app.post('/api/webhook/telegram', (req, res) => {
         const chatId = update.message.chat.id;
         const senderName = update.message.from.first_name;
         const incomingText = update.message.text;
+        
+        // --- 2. TANGKAP DATA TAMBAHAN UNTUK DATABASE ---
+        const telegramId = update.message.from.id;
+        const username = update.message.from.username || '';
 
         console.log(`[Webhook Alert] New message from ${senderName} (ID: ${chatId}): "${incomingText}"`);
         
-        // Note for future tasks (Tomorrow and the day after):
-        // This is where we will place the "Database Insert" and "Auto-Reply" logic.
+        // --- 3. MULAI KODE PENYIMPANAN DATABASE ---
+        try {
+            // A. Check & Insert User (Mencegah duplikasi data user)
+            const userExists = await db('telegram_users').where({ telegram_id: telegramId }).first();
+            if (!userExists) {
+                await db('telegram_users').insert({
+                    telegram_id: telegramId,
+                    first_name: senderName,
+                    username: username
+                });
+                console.log(`👤 New user saved: ${senderName}`);
+            }
+
+            // B. Insert Log Pesan
+            await db('webhook_logs').insert({
+                chat_id: chatId,
+                message_text: incomingText,
+                raw_payload: JSON.stringify(update)
+            });
+            console.log(`💾 Message archived to SQLite database!`);
+
+        } catch (dbError) {
+            console.error('❌ Database insertion failed:', dbError.message);
+        }
+        // --- AKHIR KODE PENYIMPANAN DATABASE ---
     }
 
     // 3. Respond with 200 OK (Crucial Step!)
     // Telegram needs confirmation that our server successfully received the data.
-    // If we don't send this, Telegram will keep resending the same webhook request.
     res.status(200).send('OK');
 });
 
