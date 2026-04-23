@@ -111,6 +111,28 @@ app.post('/api/webhook/telegram', async (req, res) => {
             console.error('❌ Database insertion failed:', dbError.message);
         }
         // --- AKHIR KODE PENYIMPANAN DATABASE ---
+
+        // --- 4. LOGIKA AUTO-REPLY ---
+        // Kita tangkap pesannya, ubah ke huruf kecil semua agar mudah dicek
+        const pesanUser = incomingText.toLowerCase();
+
+        if (pesanUser === '/start' || pesanUser === 'halo') {
+            const replyText = `Halo ${senderName}! 👋\n\nTerima kasih sudah menghubungi. Portofolio saya sedang dalam pengembangan. Untuk urusan penawaran atau kerja sama bisnis, Anda juga bisa langsung menghubungi saya melalui email: **sales@davidkaryono.dev**\n\nKetik "bantuan" jika ingin melihat menu lainnya.`;
+
+            try {
+                // Menembak balik pesan ke user yang menyapa menggunakan token bot
+                const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN;
+                await axios.post(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
+                    chat_id: chatId,
+                    text: replyText,
+                    parse_mode: 'Markdown'
+                });
+                console.log(`🤖 Auto-reply terkirim ke: ${senderName}`);
+            } catch (replyError) {
+                console.error('❌ Gagal mengirim auto-reply:', replyError.message);
+            }
+        }
+        // --- AKHIR LOGIKA AUTO-REPLY ---
     }
 
     // 3. Respond with 200 OK (Crucial Step!)
