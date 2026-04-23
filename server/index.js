@@ -10,7 +10,9 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// The Core API Endpoint: Receives contact form data
+// ==========================================
+// 1. SENDER: The Core API Endpoint (Receives contact form data)
+// ==========================================
 app.post('/api/contact', async (req, res) => {
     const { name, email, message } = req.body;
 
@@ -46,6 +48,39 @@ app.post('/api/contact', async (req, res) => {
         console.error('Webhook routing failed:', error.message);
         res.status(500).json({ error: 'Internal Server Error. Routing failed.' });
     }
+});
+
+// ==========================================
+// 2. RECEIVER: THE WEBHOOK HANDLER (Receives incoming data from Telegram)
+// ==========================================
+app.post('/api/webhook/telegram', (req, res) => {
+    // 1. Security Check: Validate the Secret Token
+    // Ensure the request comes genuinely from Telegram, not an unauthorized source.
+    const secretToken = req.headers['x-telegram-bot-api-secret-token'];
+    if (secretToken !== process.env.TELEGRAM_SECRET_TOKEN) {
+        console.warn('⚠️ Webhook Access Denied: Invalid or missing token.');
+        return res.status(403).send('Forbidden');
+    }
+
+    // 2. Parse the Payload: Catch the JSON data sent by Telegram
+    const update = req.body;
+    
+    // Check if the incoming update contains a text message
+    if (update.message && update.message.text) {
+        const chatId = update.message.chat.id;
+        const senderName = update.message.from.first_name;
+        const incomingText = update.message.text;
+
+        console.log(`[Webhook Alert] New message from ${senderName} (ID: ${chatId}): "${incomingText}"`);
+        
+        // Note for future tasks (Tomorrow and the day after):
+        // This is where we will place the "Database Insert" and "Auto-Reply" logic.
+    }
+
+    // 3. Respond with 200 OK (Crucial Step!)
+    // Telegram needs confirmation that our server successfully received the data.
+    // If we don't send this, Telegram will keep resending the same webhook request.
+    res.status(200).send('OK');
 });
 
 // Start the server
