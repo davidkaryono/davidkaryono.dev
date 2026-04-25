@@ -14,5 +14,6 @@ exports.up = function(knex) {
 };
 
 exports.down = function(knex) {
-    return knex.schema.dropTable('portfolio_leads');
+    // Tambahkan 'IfExists' agar Mandor tidak panik kalau lacinya memang tidak ada
+    return knex.schema.dropTableIfExists('portfolio_leads');
 };
